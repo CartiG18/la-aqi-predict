@@ -45,7 +45,7 @@ col1, col2 = st.columns([1, 3])
 
 with col1:
     st.subheader("Current Snapshot")
-    avg_pm25 = df['pm_2.5'].mean()
+    avg_pm25 = df['pm2_5'].mean()
     avg_temp = df['temperature'].mean()
     st.metric("Avg PM2.5 (µg/m³)", f"{avg_pm25:.2f}")
     st.metric("Avg Temperature (°F)", f"{avg_temp:.1f}")
@@ -62,7 +62,7 @@ with col2:
         "ScatterplotLayer",
         df,
         get_position=["longitude", "latitude"],
-        get_color="[255, (1 - pm_2.5 / 50) * 255, 0, 160]", # Simple gradient logic
+        get_color="[255, (1 - pm2_5 / 50) * 255, 0, 160]", # Simple gradient logic
         get_radius=200,
         pickable=True,
     )
@@ -77,7 +77,7 @@ with col2:
     st.pydeck_chart(pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
-        tooltip={"text": "PM2.5: {pm_2.5}\nTemp: {temperature}°F"}
+        tooltip={"text": "PM2.5: {pm2_5}\nTemp: {temperature}°F"}
     ))
 
 # --- ROW 2: PREDICTION INTERFACE ---
@@ -124,13 +124,13 @@ chart_col1, chart_col2 = st.columns(2)
 with chart_col1:
     st.markdown("**Temperature vs PM2.5**")
     fig, ax = plt.subplots()
-    sns.scatterplot(data=df, x='temperature', y='pm_2.5', alpha=0.5, ax=ax)
+    sns.scatterplot(data=df, x='temperature', y='pm2_5', alpha=0.5, ax=ax)
     ax.set_ylim(0, 100) # Limit y-axis to see typical range
     st.pyplot(fig)
 
 with chart_col2:
     st.markdown("**PM2.5 Distribution**")
     fig2, ax2 = plt.subplots()
-    sns.histplot(df['pm_2.5'], bins=30, kde=True, ax=ax2)
+    sns.histplot(df['pm2_5'], bins=30, kde=True, ax=ax2)
     ax2.set_xlim(0, 100)
     st.pyplot(fig2)
