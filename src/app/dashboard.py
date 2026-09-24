@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Config
-st.set_page_config(page_title="LA AQI Forecaster", layout="wide")
+st.set_page_config(page_title="LA AQI Predictor", layout="wide")
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "processed_la_aqi.csv"
 MODEL_PATH = PROJECT_ROOT / "src" / "models" / "aqi_model.joblib"
@@ -30,7 +30,7 @@ df = load_data()
 model = load_model()
 
 # Header
-st.title("Los Angeles AQI Forecasting System")
+st.title("Los Angeles AQI Prediction System")
 st.markdown("""
 This dashboard visualizes real-time Air Quality Index (AQI) data from PurpleAir sensors 
 and provides a machine learning interface to predict PM2.5 levels based on environmental factors.
@@ -58,11 +58,13 @@ with col2:
     # PM2.5 > 35 is Unhealthy (Orange/Red)
     # We visualize this using pydeck
     
+    map_df = df.assign(green=((1 - df['pm2_5'] / 50).clip(0, 1) * 255))
+
     layer = pdk.Layer(
         "ScatterplotLayer",
-        df,
+        map_df,
         get_position=["longitude", "latitude"],
-        get_color="[255, (1 - pm2_5 / 50) * 255, 0, 160]", # Simple gradient logic
+        get_color="[255, green, 0, 160]", # Yellow -> red, saturating at 50
         get_radius=200,
         pickable=True,
     )

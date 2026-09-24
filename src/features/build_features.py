@@ -37,31 +37,15 @@ class AQIFeatureEngineer:
 
     def engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Generates temporal and spatial features.
-        Since we currently have a snapshot, we will simulate time features 
-        based on the 'sensor_index' assuming it might proxy for location/grouping,
-        but realistically we need time-series data. 
-        
-        *Crucial Note*: The current API call fetches a *snapshot* (current 10-min avg).
-        To train a forecasting model, we ideally need historical data.
-        
-        For this MVP, we will:
-        1. Add dummy time features (current time) to show the pipeline structure.
-        2. Create 'spatial' features (clustering lat/lon if we had them, 
-           but we dropped them in ingest. Let's fix ingest to keep them first? 
-           Actually, let's keep it simple for now).
-        
-        Wait, the ingest script kept: pm2.5, temp, humidity.
-        We can use temp/humidity as features for PM2.5.
+        Generates model features from temperature and humidity.
+
+        The ingested data is a single snapshot (current 10-minute averages), so
+        there are no temporal features; forecasting would require historical data.
+        Latitude/longitude are kept for the dashboard map but not used as features.
         """
-        
-        # 1. Interaction Features
         # High Temp + Low Humidity often correlates with fires/dust
         df['temp_humidity_interaction'] = df['temperature'] * df['humidity']
-        
-        # 2. Binning (e.g., Temp bins)
-        df['temp_bin'] = pd.cut(df['temperature'], bins=5, labels=False)
-        
+
         return df
 
     def run(self):

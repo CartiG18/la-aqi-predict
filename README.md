@@ -1,11 +1,11 @@
-# Los Angeles AQI Forecasting System 🌫️☀️
+# Los Angeles AQI Prediction System 🌫️☀️
 
-A robust, production-ready machine learning pipeline for forecasting Air Quality Index (AQI) in the Los Angeles basin. This system ingests real-time data from PurpleAir sensors, processes it to generate features, trains a Random Forest predictive model, and serves predictions via both a REST API and an interactive Dashboard.
+A machine learning pipeline for estimating air quality (PM2.5 concentration) in the Los Angeles basin. This system ingests real-time data from PurpleAir sensors, processes it to generate features, trains a Random Forest model that predicts PM2.5 from temperature and humidity, and serves predictions via both a REST API and an interactive Dashboard.
 
 ## 🚀 Features
 
 *   **Automated Data Ingestion:** Robust extraction from PurpleAir API with retry logic and Pydantic validation.
-*   **Geospatial Processing:** Handles sensor locations (lat/lon) for mapping and spatial analysis.
+*   **Geospatial Visualization:** Keeps sensor locations (lat/lon) to map PM2.5 levels across the basin.
 *   **Machine Learning Pipeline:** Modular design for Feature Engineering, Training, and Evaluation.
 *   **Production API:** FastAPI application for real-time inference, containerized with Docker.
 *   **Interactive Dashboard:** Streamlit app for data visualization, model testing, and geospatial exploration.
@@ -28,8 +28,8 @@ la-aqi-predict/
 │   ├── features/        # Feature Engineering
 │   │   └── build_features.py
 │   └── models/          # Model Training
-│       └── train_model.py
-├── tests/               # Unit tests
+│       ├── train_model.py
+│       └── aqi_model.joblib  # Trained model artifact
 ├── Dockerfile           # Container definition
 ├── requirements.txt     # Python dependencies
 └── .env                 # Secrets (API Keys)
@@ -99,7 +99,7 @@ uvicorn src.api.main:app --reload
 
 ## 🐳 Docker Deployment
 
-Build and run the entire application container:
+Build and run the inference API in a container (the dashboard is not included; run it locally as above):
 
 ```bash
 docker build -t la-aqi-predictor .
@@ -108,10 +108,18 @@ docker run -p 8000:8000 la-aqi-predictor
 
 ## 🔬 Methodology
 
-*   **Data Source:** PurpleAir (PM2.5, Temperature, Humidity).
-*   **Preprocessing:** Outlier clipping, missing value handling.
+*   **Data Source:** PurpleAir (PM2.5, Temperature, Humidity) — a single snapshot of current 10-minute averages.
+*   **Preprocessing:** Negative-value clipping, dropping rows with missing PM2.5.
+*   **Features:** Temperature, humidity, and their interaction term.
 *   **Model:** Random Forest Regressor (Scikit-Learn).
 *   **Evaluation:** MAE, RMSE, R-Squared.
+
+### Limitations
+
+*   **Not a forecast:** the model estimates *current* PM2.5 from current conditions. True forecasting would require historical time-series data.
+*   **PM2.5, not AQI:** predictions are PM2.5 concentrations (µg/m³), bucketed into AQI categories; they are not converted to the numeric AQI scale.
+*   **Sensor temperature bias:** PurpleAir's `temperature` field is measured inside the sensor housing and typically reads several °F above ambient, so the model learns from that biased signal.
+*   **Model/library coupling:** `aqi_model.joblib` must be loaded with the same scikit-learn version it was trained with (pinned in `requirements.txt`). Update the pin whenever you retrain.
 
 ## 🤝 Contributing
 
