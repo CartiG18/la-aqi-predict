@@ -1,8 +1,8 @@
-# Los Angeles AQI Prediction System 🌫️☀️
+# Los Angeles AQI Prediction System
 
 A machine learning pipeline for estimating air quality (PM2.5 concentration) in the Los Angeles basin. This system ingests real-time data from PurpleAir sensors, processes it to generate features, trains a Random Forest model that predicts PM2.5 from temperature and humidity, and serves predictions via both a REST API and an interactive Dashboard.
 
-## 🚀 Features
+## Features
 
 *   **Automated Data Ingestion:** Robust extraction from PurpleAir API with retry logic and Pydantic validation.
 *   **Geospatial Visualization:** Keeps sensor locations (lat/lon) to map PM2.5 levels across the basin.
@@ -10,7 +10,7 @@ A machine learning pipeline for estimating air quality (PM2.5 concentration) in 
 *   **Production API:** FastAPI application for real-time inference, containerized with Docker.
 *   **Interactive Dashboard:** Streamlit app for data visualization, model testing, and geospatial exploration.
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 la-aqi-predict/
@@ -35,7 +35,7 @@ la-aqi-predict/
 └── .env                 # Secrets (API Keys)
 ```
 
-## 🛠️ Setup
+## Setup
 
 1.  **Clone the repository:**
     ```bash
@@ -60,7 +60,7 @@ la-aqi-predict/
     PURPLE_AIR_API_KEY=your_api_key_here
     ```
 
-## 🏃‍♂️ Usage
+## Usage
 
 ### 1. Run the Data Pipeline (ETL & Training)
 Execute these scripts in order to fetch data, process it, and retrain the model.
@@ -97,7 +97,7 @@ uvicorn src.api.main:app --reload
          -d '{"temperature": 75.0, "humidity": 45.0}'
     ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 Build and run the inference API in a container (the dashboard is not included; run it locally as above):
 
@@ -120,11 +120,3 @@ docker run -p 8000:8000 la-aqi-predictor
 *   **PM2.5, not AQI:** predictions are PM2.5 concentrations (µg/m³), bucketed into AQI categories; they are not converted to the numeric AQI scale.
 *   **Sensor temperature bias:** PurpleAir's `temperature` field is measured inside the sensor housing and typically reads several °F above ambient, so the model learns from that biased signal.
 *   **Model/library coupling:** `aqi_model.joblib` must be loaded with the same scikit-learn version it was trained with (pinned in `requirements.txt`). Update the pin whenever you retrain.
-
-## 🤝 Contributing
-
-1.  Fork the repo
-2.  Create a feature branch (`git checkout -b feature/amazing-feature`)
-3.  Commit changes (`git commit -m 'Add amazing feature'`)
-4.  Push to branch (`git push origin feature/amazing-feature`)
-5.  Open a Pull Request
